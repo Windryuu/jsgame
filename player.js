@@ -6,12 +6,16 @@ export class Player{
         this.width = 100;
         this.height = 91.3;
         this.x = 0;
-        this.y = this.game.height - this.height;
+        this.y = this.game.height - this.height - this.game.groundMargin;
         this.vy = 0;
         this.weight = 1;
         this.image = document.getElementById('player');
         this.frameX = 0;
         this.frameY = 0;
+        this.maxFrame = 5;
+        this.fps = 30;
+        this.frameInterval = 1000/this.fps;
+        this.frameTimer = 0;
         this.speed = 0;
         this.maxSpeed = 10;
         this.states = [new Sitting(this),new Running(this),new Jumping(this),new Falling(this)];
@@ -21,7 +25,7 @@ export class Player{
 
     //move player around based on player input
     //cycle through the sprite frames
-    update(input){
+    update(input, deltaTime){
         this.currentState.handleInput(input);
         //horizontal movement
         this.x += this.speed;
@@ -35,7 +39,14 @@ export class Player{
         if(!this.onGround()) this.vy += this.weight;
         else this.vy = 0;
         //sprite animation
-
+        if(this.frameTimer > this.frameInterval){
+            this.frameTimer = 0;
+            if(this.frameX < this.maxFrame) this.frameX++;
+            else this.frameX = 0;
+        } else {
+            this.frameTimer += deltaTime;
+        }
+        
     }
 
     //take the update value to draw the active frame 
@@ -44,11 +55,12 @@ export class Player{
     }
 
     onGround(){
-        return this.y >= this.game.height - this.height;
+        return this.y >= this.game.height - this.height - this.game.groundMargin;
     }
 
-    setState(state){
+    setState(state,speed){
         this.currentState = this.states[state];
+        this.game.speed = this.game.maxSpeed * speed;
         this.currentState.enter();
     }
 
