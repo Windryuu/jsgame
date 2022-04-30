@@ -26,6 +26,7 @@ export class Player{
     //move player around based on player input
     //cycle through the sprite frames
     update(input, deltaTime){
+        
         this.currentState.handleInput(input);
         //horizontal movement
         this.x += this.speed;
@@ -51,6 +52,10 @@ export class Player{
 
     //take the update value to draw the active frame 
     draw(context){
+        //context.fillRect(this.x,this.y,this.width,this.height);
+        context.beginPath();
+        context.arc(this.x + this.width/2, this.y + this.height/2,this.width/2,0,Math.PI *2);
+        context.stroke();
         context.drawImage(this.image,this.frameX * this.width,this.frameY * this.height,this.width,this.height,this.x,this.y,this.width,this.height)
     }
 

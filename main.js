@@ -8,6 +8,8 @@ window.addEventListener('load',function(){
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
+    let score = 0;
+    let gameOver = false;
 
     class Game{
         constructor(width,height){
@@ -38,8 +40,26 @@ window.addEventListener('load',function(){
 
             this.enemies.forEach(enemy => {
                 enemy.update(deltaTime);
-                if(enemy.markedForDeletion) this.enemies.splice(this.enemies.indexOf(enemy),1);
+
+                //collision
+        
+                const dx = enemy.x - this.player.x;
+                const dy = enemy.y - this.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if(distance < enemy.width/2 + this.player.width/2){
+                    // this.score++;
+                    // console.log(this.score);
+                    gameOver = true;
+                }
+        
+                
+                if(enemy.markedForDeletion){
+                    this.enemies.splice(this.enemies.indexOf(enemy),1);
+                    score++;
+                }
             })
+
         }
 
         //will draw our images, score and so on
@@ -57,6 +77,12 @@ window.addEventListener('load',function(){
             this.enemies.push(new FlyingEnemy(this));
             console.log(this.enemies);
         }
+
+        displayStatusText(context){
+            context.fillStyle = 'black';
+            context.font = '40px Helvetica';
+            context.fillText('Score: ' + score, 20, 50)
+        }
     }
 
     const game = new Game(canvas.width,canvas.height);
@@ -70,7 +96,9 @@ window.addEventListener('load',function(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         game.update(deltaTime);
         game.draw(ctx);
-        requestAnimationFrame(animate);
+        game.displayStatusText(ctx);
+        if(!gameOver)requestAnimationFrame(animate);
+        //console.log(this.score);
     }
 
     animate(0);
